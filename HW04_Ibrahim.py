@@ -1,15 +1,14 @@
+from unittest import mock
 import requests
 import json
 import unittest
 
 
 class TestFunctions(unittest.TestCase):
-    def test_getHub_repo(self):
-        self.assertEqual(len(getHub_repo("richkempinski")), 5)
-        with self.assertRaises(ValueError):
-            getHub_repo("test__")
 
-    def test_getHub_repo(self):
+    @mock.patch('HW04_Ibrahim.number_commits')
+    def test_number_commits(self, mockedReq):
+        mockedReq.return_value = 6
         self.assertEqual(number_commits("richkempinski", "helloworld"), 6)
 
 
@@ -17,7 +16,7 @@ def getHub_repo(user_name):
     """ to get the names of the repositories in GetHub """
     output = []
     get_url = requests.get(f'https://api.github.com/users/{user_name}/repos')
-    repo_list = get_url.json()
+    repo_list = json.loads(get_url.text)
 
     try:
         for line in repo_list:
@@ -32,7 +31,7 @@ def getHub_repo(user_name):
 def number_commits(user_name, repo):
     """ to get the number of commits in a repository """
     get_url = requests.get('https://api.github.com/repos/{}/{}/commits'.format(user_name, repo))
-    commits = get_url.json()
+    commits = json.loads(get_url.text)
 
     if commits == 0:
         print('the repo has no commits')
